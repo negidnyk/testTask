@@ -3,6 +3,10 @@ from dotenv import load_dotenv
 from sqlalchemy import MetaData
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
@@ -25,3 +29,9 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 Base = declarative_base()
 
 session_factory = sessionmaker(engine)
+
+async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session

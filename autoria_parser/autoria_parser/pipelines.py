@@ -10,7 +10,7 @@ class AutoriaParserPipeline:
             print("Data to be store, URL", item['url'])
             car_item = CarItem(url=item['url'],
                                title=item['title'],
-                               price=item['price'],
+                               price_in_eur=item['price_in_eur'],
                                brand=item['brand'],
                                model=item['model'],
                                year=item['year'],

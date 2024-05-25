@@ -9,7 +9,7 @@ class CarItem(Base):
     id = Column(Integer, primary_key=True, index=True, nullable=False, unique=True)
     url = Column(String(150), nullable=False)
     title = Column(String(100), nullable=True)
-    price = Column(String(50), nullable=True)
+    price_in_eur = Column(String(50), nullable=True)
     brand = Column(String(100), nullable=False)
     model = Column(String(100), nullable=False)
     year = Column(String(10), nullable=True)

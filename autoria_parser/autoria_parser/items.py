@@ -4,7 +4,7 @@ import datetime
 class AutoriaParserItem(scrapy.Item):
     url = scrapy.Field()
     title = scrapy.Field()
-    price = scrapy.Field()
+    price_in_eur = scrapy.Field()
     brand = scrapy.Field()
     model = scrapy.Field()
     year = scrapy.Field()

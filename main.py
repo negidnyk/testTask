@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from auth.base_config import auth_backend, fastapi_users
-from cars import router as cars_router
+from autoria_parser.autoria_parser.spiders.router import router as cars_router
 
 app = FastAPI(
     title="Scraper"
