@@ -35,10 +35,15 @@ class CarsSpider(scrapy.Spider):
         car_item_date_str = car_item_date_without_text[0]
         car_item_formatted_date = datetime.strptime(car_item_date_str, '%d.%m.%Y').date()
 
+        raw_price = response.xpath('//span[@class="i-block"]/span[@data-currency="EUR"]/text()').extract()[0]
+        formatted_price = int(raw_price.replace(' ', ''))
+
         car_item = {'url': response.request.url,
-                    'title': response.xpath('//h1[@class="head"]/@title').get(),
-                    'price_in_eur': response.xpath('//span[@class="i-block"]/span[@data-currency="EUR"]/text()').extract()[0],
-                    'brand': brand,'model': model,'year': year,
+                    'title': response.xpath('//h1[@class="head"]/@title').get().lower(),
+                    'price_in_eur': formatted_price,
+                    'brand': brand.lower(),
+                    'model': model.lower(),
+                    'year': year,
                     'region': response.xpath('//*[@id="breadcrumbs"]/div[3]/a/span/text()').get().strip(),
                     'mileage': response.xpath('//span[@class="size18"]/text()').get(),
                     'color': response.xpath('//span[@class="car-color"]/following-sibling::text()')[0].get().strip(),
