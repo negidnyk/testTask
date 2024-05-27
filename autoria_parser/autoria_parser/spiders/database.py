@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from sqlalchemy import MetaData
 from sqlalchemy import create_engine
 from typing import AsyncGenerator
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -23,6 +23,7 @@ SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg://{DB_USER}:{DB_PASS}@{DB_HOST}:{
 
 # async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+
 
 # Use declarative base for models
 Base = declarative_base()

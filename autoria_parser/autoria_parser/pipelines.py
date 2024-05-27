@@ -23,7 +23,5 @@ class AutoriaParserPipeline:
                                seller_contacts=item['seller_contacts'],
                                )
             session.add_all([car_item])
-            # flush отправляет запрос в базу данных
-            # После flush каждый из item получает первичный ключ id, который отдала БД
             session.flush()
             session.commit()

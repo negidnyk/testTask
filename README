@@ -1,0 +1,78 @@
+Шаги по запуску проекта, после копирования кода из гитхаба:
+1. pip install -r requirements.txt
+2. Создать .env файл в корне проекта ({local_machine}/testTask)
+3. В .env файле прописать зависимости:
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME={your_postgres_db_name}
+DB_USER={your_postgres_db_user}
+DB_PASS={your_postgres_db_pass}
+
+
+AUTH_SECRET={any string}
+RESET_PASS_SECRET={any secret}
+
+4. Создать миграции командой "alembic revision --autogenerate" и обновить состояние БД командой "alembic upgrade head"
+Если миграции создаются пустые, убедться, что в файле по пути testTask/migrations/env.py импортированы Base и модели:
+-- from autoria_parser.autoria_parser.spiders.database import Base
+-- from autoria_parser.autoria_parser.spiders.models import CarItem
+-- from auth.models import Role, User
+
+5. В новосозданной БД вручную ввести хотя-бы одну роль в таблицу "role" (не до конца разобрался пока как заводить данные сразу с миграциями(()
+Таблица "role" связана с таблицей "user" по id
+
+6. Перейти в корень проекта ({local_machine}/testTask) и запустить приложение командой: "uvicorn main:app --reload"
+
+7. Перейти в сваггер (http://127.0.0.1:8000/docs#/)
+
+8. Зарегистировать себе юзера с помощью эндпоинта для регистрации. Пример данных:
+{
+  "email": "example@gmail.com",
+  "password": "Qwerty12",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "Ninja",
+  "role_id": 1
+}
+
+9. Залогиниться созданным (получить токен) с помошью эндпоинта для логина:
+username: почта
+password:  пароль
+
+10. В файле testTask/autoria_parser/autoria_parser/spiders/router.py в роуте:
+@router.post("/run-spider/", status_code=201, description="Parses first 10 pages with cars info from auto.ria and"
+                                                          " saves a data to database")
+def run_spider(user: User = Security(current_active_user)):
+    ##############os.chdir('C:/Users/Артем/PycharmProjects/testTask/autoria_parser')################
+    result = subprocess.run(['scrapy', 'crawl', 'cars'], capture_output=True, text=True)
+    return {"stdout": result.stdout, "stderr": result.stderr}
+
+Заменить значение пути в строчке на свой локальный путь os.chdir('{local}/testTask/autoria_parser')
+
+11. Дернуть эндпоинт /cars/run-spider в Postman или Swagger, дождаться выполнения
+
+12. После успешной отработки паука, в БД запишутся данные, если креды БД были указаны верно
+
+13 Можно использовать эндпоинты для статистики по заданию
+
+######################################################################################################################
+
+14. Кэш прикрутил от Redis на эндпоинты с экспайром в день (не разобрался, как навешывать кэш именно на БД и удалять все
+ через день, если я правильно понял по заданию)
+
+15. По поводу эндпоинтов: с задания не совсем ясно: нужно было делать на каждый вид статистики отдельные эндпоинты или
+все вместе собрать в одном. Поэтому я сделал и так, и так. На всякий случай)
+
+16. Некоторые данные иногда не точно вытягиваются. По этмоу есть несколько вопросов
+
+P.S. Ооочень извиняюсь за то, что заставил себя долго ждать, смог начать делать тестовое только в понедельник вечером
+В общей сумме, делал тестовое 5-6 дней по пару часов. Поскольку, не успел отдать задание до выходных, 1 день оставил на
+правки и инструкции по запуску
+
+P.S.S. В ходе выполнения задания, насобиралось вопросов. Было бы здорово, если бы была возможность их осбудить
+
+Хорошего и мирного вам дня!)
+
+######################################################################################################################

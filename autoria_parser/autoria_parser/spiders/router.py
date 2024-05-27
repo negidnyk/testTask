@@ -14,6 +14,7 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
+from pydantic.schema import date
 import subprocess
 import os
 
@@ -34,28 +35,12 @@ def run_spider(user: User = Security(current_active_user)):
     return {"stdout": result.stdout, "stderr": result.stderr}
 
 
-@router.get("/", status_code=200, description="Returns all car items which were parsed from auto.ria and saved in DB")
+@router.get("/", status_code=200, description="Returns all car items which were parsed from auto.ria and saved in DB by"
+                                              " submitted period of ads creation date. "
+                                              "Example of input data: '2024-02-14'")
 @cache(expire=86400)
-def get_all_cars_data(user: User = Security(current_active_user)):
-    with session_factory() as session:
-        query = select(CarItem)
-        car_items = session.execute(query)
-        result_list = car_items.scalars().all()
-        return [GetCarItem(id=result_list[item_id].id,
-                           url=result_list[item_id].url,
-                           title=result_list[item_id].title,
-                           price_in_eur=result_list[item_id].price_in_eur,
-                           brand=result_list[item_id].brand,
-                           model=result_list[item_id].model,
-                           year=result_list[item_id].year,
-                           region=result_list[item_id].region,
-                           mileage=result_list[item_id].mileage,
-                           color=result_list[item_id].color,
-                           cabin_color=result_list[item_id].cabin_color,
-                           cabin_material=result_list[item_id].cabin_material,
-                           ad_creation_date=result_list[item_id].ad_creation_date,
-                           seller_contacts=result_list[item_id].seller_contacts,
-                           created_at=result_list[item_id].created_at) for item_id in range(0, len(result_list))]
+def get_all_cars_data_by_period(date_from: date, date_to: date):
+    return CarORM.get_all_cars_by_time_period(date_from, date_to)
 
 
 @router.get("/min-price/{brand}/{model}", status_code=200, description="Returns the lowest price by brand and model")
