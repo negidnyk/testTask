@@ -29,17 +29,24 @@ current_active_user = fastapi_users.current_user(active=True)
 
 @router.post("/run-spider/", status_code=201, description="Parses first 10 pages with cars info from auto.ria and"
                                                           " saves a data to database")
+@cache(expire=86400)
 def run_spider(user: User = Security(current_active_user)):
     os.chdir('C:/Users/Артем/PycharmProjects/testTask/autoria_parser')
     result = subprocess.run(['scrapy', 'crawl', 'cars'], capture_output=True, text=True)
     return {"stdout": result.stdout, "stderr": result.stderr}
 
 
+@router.get("/by_url", status_code=200, description="Returns all car item details by url")
+@cache(expire=86400)
+def get_all_cars_data_by_url(url: str, user: User = Security(current_active_user)):
+    return CarORM.get_car_details_by_url(url)
+
+
 @router.get("/", status_code=200, description="Returns all car items which were parsed from auto.ria and saved in DB by"
                                               " submitted period of ads creation date. "
                                               "Example of input data: '2024-02-14'")
 @cache(expire=86400)
-def get_all_cars_data_by_period(date_from: date, date_to: date):
+def get_all_cars_data_by_period(date_from: date, date_to: date, user: User = Security(current_active_user)):
     return CarORM.get_all_cars_by_time_period(date_from, date_to)
 
 
