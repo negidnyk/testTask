@@ -4,6 +4,7 @@ from .models import CarItem
 from .schemas import GetCarItem
 from sqlalchemy import Integer, and_, cast, func, insert, inspect, or_, select, text, String, between
 from dateutil.relativedelta import relativedelta
+from fastapi_cache.decorator import cache
 from sqlalchemy.orm import aliased, contains_eager, joinedload, selectinload
 
 
@@ -20,21 +21,24 @@ class CarORM:
 
             query_result = session.execute(query)
             result_list = query_result.scalars().all()
-            return [GetCarItem(id=result_list[item_id].id,
-                               url=result_list[item_id].url,
-                               title=result_list[item_id].title,
-                               price_in_eur=result_list[item_id].price_in_eur,
-                               brand=result_list[item_id].brand,
-                               model=result_list[item_id].model,
-                               year=result_list[item_id].year,
-                               region=result_list[item_id].region,
-                               mileage=result_list[item_id].mileage,
-                               color=result_list[item_id].color,
-                               cabin_color=result_list[item_id].cabin_color,
-                               cabin_material=result_list[item_id].cabin_material,
-                               ad_creation_date=result_list[item_id].ad_creation_date,
-                               seller_contacts=result_list[item_id].seller_contacts,
-                               created_at=result_list[item_id].created_at) for item_id in range(0, len(result_list))]
+            if result_list:
+                return [GetCarItem(id=result_list[item_id].id,
+                                   url=result_list[item_id].url,
+                                   title=result_list[item_id].title,
+                                   price_in_eur=result_list[item_id].price_in_eur,
+                                   brand=result_list[item_id].brand,
+                                   model=result_list[item_id].model,
+                                   year=result_list[item_id].year,
+                                   region=result_list[item_id].region,
+                                   mileage=result_list[item_id].mileage,
+                                   color=result_list[item_id].color,
+                                   cabin_color=result_list[item_id].cabin_color,
+                                   cabin_material=result_list[item_id].cabin_material,
+                                   ad_creation_date=result_list[item_id].ad_creation_date,
+                                   seller_contacts=result_list[item_id].seller_contacts,
+                                   created_at=result_list[item_id].created_at) for item_id in range(0, len(result_list))]
+            else:
+                return {"Sorry! There are no items with submitted url in DB"}
 
     @staticmethod
     def get_all_cars_by_time_period(date_from, date_to):

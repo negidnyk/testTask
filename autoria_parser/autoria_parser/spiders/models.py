@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, String, TIMESTAMP, Date
 from .database import Base
 
 
+
 class CarItem(Base):
     __tablename__ = "car_item"
 
